@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="303mm" height="426mm" viewBox="0 0 3579 5032">
+  <title>知了 AI 信息秘书产品海报</title>
+  <desc>A3 竖版，四边包含 3mm 出血</desc>
+  <defs>
+    <linearGradient id="imageFade" x1="0" x2="1">
+      <stop offset="0" stop-color="#f6f0e4" stop-opacity="1"/>
+      <stop offset="0.52" stop-color="#f6f0e4" stop-opacity="0.88"/>
+      <stop offset="0.78" stop-color="#f6f0e4" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#f6f0e4" stop-opacity="0"/>
+    </linearGradient>
+    <style>
+      .serif { font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", serif; }
+      .sans { font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif; }
+      .ink { fill: #292a25; }
+      .muted { fill: #65665e; }
+      .red { fill: #a94736; }
+    </style>
+  </defs>
+
+  <!-- 303 × 426 mm artwork includes 3 mm bleed on every edge. Trim: x/y 35.4, 3508 × 4961. -->
+  <rect width="3579" height="5032" fill="#f6f0e4"/>
+  <image x="0" y="0" width="3579" height="5032" preserveAspectRatio="xMidYMid slice" xlink:href="zhiliao-poster-background.png"/>
+  <rect x="0" y="0" width="2520" height="5032" fill="url(#imageFade)"/>
+
+  <!-- All important text stays more than 5 mm inside the trim edge. -->
+  <g transform="translate(330 360)">
+    <text class="serif ink" x="0" y="0" font-size="92" font-weight="700" letter-spacing="10">知了<tspan class="red">。</tspan></text>
+    <text class="sans muted" x="4" y="120" font-size="30" letter-spacing="9">AI 信息秘书</text>
+
+    <g transform="translate(0 620)">
+      <text class="serif ink" x="0" y="0" font-size="154" font-weight="700">信息太多。</text>
+      <text class="serif ink" x="0" y="205" font-size="154" font-weight="700">真正值得注意的，</text>
+      <text class="serif red" x="0" y="410" font-size="154" font-weight="700">很少。</text>
+      <text class="sans muted" x="8" y="565" font-size="42" letter-spacing="2">让信息围绕目标，而不是围绕你。</text>
+    </g>
+
+    <g transform="translate(0 2030)">
+      <line x1="0" y1="0" x2="1540" y2="0" stroke="#292a25" stroke-opacity="0.34" stroke-width="3"/>
+      <text class="sans muted" x="0" y="105" font-size="31" letter-spacing="6">接入</text>
+      <circle cx="190" cy="94" r="7" fill="#a94736"/>
+      <text class="sans muted" x="250" y="105" font-size="31" letter-spacing="6">判断</text>
+      <circle cx="440" cy="94" r="7" fill="#a94736"/>
+      <text class="sans muted" x="500" y="105" font-size="31" letter-spacing="6">行动</text>
+      <circle cx="690" cy="94" r="7" fill="#a94736"/>
+      <text class="sans muted" x="750" y="105" font-size="31" letter-spacing="6">沉淀</text>
+    </g>
+
+    <g transform="translate(0 2530)">
+      <g>
+        <text class="serif ink" x="0" y="0" font-size="58" font-weight="600">现在，只看值得注意的</text>
+        <text class="sans muted" x="0" y="86" font-size="31">按照当前目标，筛出行动、变化与真正的新信息。</text>
+      </g>
+      <g transform="translate(0 300)">
+        <text class="serif ink" x="0" y="0" font-size="58" font-weight="600">变化，只在有意义时出现</text>
+        <text class="sans muted" x="0" y="86" font-size="31">历史默认折叠；截止时间、规则改变时再提醒你。</text>
+      </g>
+      <g transform="translate(0 600)">
+        <text class="serif ink" x="0" y="0" font-size="58" font-weight="600">知识，按主题留下</text>
+        <text class="sans muted" x="0" y="86" font-size="31">同类内容聚合为一个主题，摘要唯一，来源随时可查。</text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(330 4595)">
+    <line x1="0" y1="0" x2="2919" y2="0" stroke="#292a25" stroke-opacity="0.24" stroke-width="3"/>
+    <text class="sans ink" x="0" y="105" font-size="32" font-weight="600" letter-spacing="4">目标感知的注意力路由</text>
+    <text class="sans muted" x="0" y="170" font-size="27" letter-spacing="2">少一点打扰，多一点真正有用的记忆。</text>
+    <g transform="translate(2530 62)">
+      <circle cx="42" cy="42" r="42" fill="none" stroke="#a94736" stroke-width="4"/>
+      <circle cx="42" cy="42" r="8" fill="#a94736"/>
+      <path d="M42 0 C42 -30 82 -34 98 -10 M42 84 C42 118 2 122 -16 100" fill="none" stroke="#a94736" stroke-width="4"/>
+      <text class="serif ink" x="118" y="57" font-size="48" font-weight="700">知了</text>
+    </g>
+  </g>
+</svg>

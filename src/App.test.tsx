@@ -175,4 +175,30 @@ describe('Zhilia demo', () => {
     await user.click(within(picker).getByRole('button', { name: /赛程更新.png/ }))
     expect(within(screen.getByRole('dialog', { name: '来源' })).getByText('图片右上区域 · 12:51')).toBeVisible()
   })
+
+  it('keeps detailed import and opens an independent global quick capture', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: '导入新信息' })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: '快速接入' }))
+    const dialog = screen.getByRole('dialog', { name: '快速接入' })
+    expect(within(dialog).getByLabelText('新信息')).toBeVisible()
+    expect(within(dialog).getByText(/当前目标/)).toBeVisible()
+    expect(within(dialog).getByLabelText('上传音频')).toHaveAttribute('accept', 'audio/*')
+  })
+
+  it('opens quick capture by shortcut and simulates voice capture', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.keyboard('{Control>}k{/Control}')
+    const dialog = screen.getByRole('dialog', { name: '快速接入' })
+    await user.click(within(dialog).getByRole('button', { name: '开始语音输入' }))
+    expect(within(dialog).getByRole('button', { name: '结束语音输入' })).toBeVisible()
+    await user.click(within(dialog).getByRole('button', { name: '结束语音输入' }))
+    expect(within(dialog).getByText('已接入一段语音')).toBeVisible()
+    await user.click(within(dialog).getByRole('button', { name: '接入信息' }))
+    expect(within(dialog).getByText('归入：用户记忆与知识库')).toBeVisible()
+  })
 })
