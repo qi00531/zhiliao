@@ -21,6 +21,60 @@ describe('Zhilia demo', () => {
 
     expect(signal).not.toBeInTheDocument()
     expect(screen.getByText('完成黑客松海报')).toBeInTheDocument()
+    expect(screen.getByRole('complementary', { name: '今天你已经知道' })).toHaveTextContent('13:45 前完成组队确认')
+    expect(screen.getByLabelText('1 条已知道')).toBeVisible()
+    expect(screen.getByRole('status')).toHaveTextContent('已加入“今天你已经知道”')
+  })
+
+  it('expands known details and reuses the source viewer', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: '知道了：13:45 前完成组队确认' }))
+    const board = screen.getByRole('complementary', { name: '今天你已经知道' })
+    await user.click(within(board).getByRole('button', { name: /13:45 前完成组队确认/ }))
+
+    expect(within(board).getByText('为什么重要')).toBeVisible()
+    expect(within(board).getByText(/距离截止只剩 28 分钟/)).toBeVisible()
+    expect(within(board).getByText(/所有参赛队伍须于今日 13:45/)).toBeVisible()
+    await user.click(within(board).getByRole('button', { name: '查看已知来源：13:45 前完成组队确认' }))
+    expect(screen.getByRole('dialog', { name: '来源' })).toBeVisible()
+  })
+
+  it('does not add deferred signals to the known board', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: '稍后处理：13:45 前完成组队确认' }))
+
+    expect(screen.getByRole('complementary', { name: '今天你已经知道' })).not.toHaveTextContent('13:45 前完成组队确认')
+    expect(screen.getByLabelText('0 条已知道')).toBeVisible()
+  })
+
+  it('promotes known content only after every current item is handled', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const dashboard = screen.getByLabelText('注意力看板')
+
+    await user.click(screen.getByRole('button', { name: '知道了：13:45 前完成组队确认' }))
+    await user.click(screen.getByRole('button', { name: '知道了：Direction 3 要求 GitHub 仓库公开' }))
+    expect(dashboard).not.toHaveClass('attention-grid--review')
+
+    await user.click(screen.getByRole('button', { name: '标记行动完成' }))
+    expect(dashboard).toHaveClass('attention-grid--review')
+    expect(screen.getByRole('heading', { name: '审阅你已经确认的内容' })).toBeVisible()
+    expect(screen.getByLabelText('2 条已知道')).toBeVisible()
+  })
+
+  it('clears known content when the demo is reset', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: '知道了：13:45 前完成组队确认' }))
+    await user.click(screen.getByRole('button', { name: /重置/ }))
+
+    expect(screen.getByLabelText('0 条已知道')).toBeVisible()
+    expect(screen.getByRole('button', { name: '知道了：13:45 前完成组队确认' })).toBeVisible()
   })
 
   it('reveals source evidence without leaving the briefing', async () => {
