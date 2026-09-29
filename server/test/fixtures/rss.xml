@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<rss version="2.0"><channel>
+  <title>Example</title><link>https://example.com/</link><ttl>60</ttl>
+  <item><guid>entry-1</guid><title>First entry</title><link>/posts/1</link>
+    <description><![CDATA[<p>Plain &amp; useful summary</p>]]></description>
+    <author>Ada</author><pubDate>Sat, 20 Sep 2026 08:00:00 GMT</pubDate>
+  </item>
+</channel></rss>
