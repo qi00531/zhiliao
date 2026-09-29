@@ -5,18 +5,27 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "concurrently -k \"npm run dev\" \"npm run server:dev\"",
     "build": "tsc -b && vite build",
+    "server:dev": "tsx watch server/index.ts",
+    "server:start": "tsx server/index.ts",
+    "db:migrate": "tsx server/db/migrate.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@fastify/static": "^10.1.5",
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
+    "fast-xml-parser": "^5.11.2",
+    "fastify": "^5.12.5",
+    "lucide-react": "latest",
+    "pg": "^8.23.0",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest"
+    "typescript": "latest",
+    "vite": "latest",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "latest",
@@ -24,13 +33,16 @@
     "@testing-library/react": "latest",
     "@testing-library/user-event": "latest",
     "@types/node": "latest",
+    "@types/pg": "^8.23.1",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "concurrently": "^10.0.5",
     "eslint": "latest",
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
     "globals": "latest",
     "jsdom": "latest",
+    "tsx": "^4.23.15",
     "vitest": "latest"
   }
 }
