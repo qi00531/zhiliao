@@ -5,6 +5,8 @@ import type { RssInitialMode, RssItemDto, RssSourceDto } from './types'
 export function useRss() {
   const [sources, setSources] = useState<RssSourceDto[]>([])
   const [items, setItems] = useState<RssItemDto[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const connect = useCallback(async (url: string, mode: RssInitialMode) => {
     const result = await rssApi.connect(url, mode)
@@ -14,10 +16,18 @@ export function useRss() {
   }, [])
 
   const load = useCallback(async () => {
-    const [nextSources, nextItems] = await Promise.all([rssApi.listSources(), rssApi.listItems()])
-    setSources(nextSources)
-    setItems(nextItems)
+    setLoading(true)
+    try {
+      const [nextSources, nextItems] = await Promise.all([rssApi.listSources(), rssApi.listItems()])
+      setSources(nextSources)
+      setItems(nextItems)
+      setError('')
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : '暂时无法读取 RSS')
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  return { sources, items, connect, load, setSources, setItems }
+  return { sources, items, loading, error, connect, load, setSources, setItems }
 }

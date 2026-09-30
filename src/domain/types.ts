@@ -19,6 +19,15 @@ export interface EvidenceTarget {
   preview: string
 }
 
+export interface EvidenceViewModel {
+  title: string
+  kind: SourceKind
+  preview: string
+  excerpt: string
+  locator: string
+  url?: string | null
+}
+
 export interface Revision {
   id: string
   previousValue: string

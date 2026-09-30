@@ -40,6 +40,7 @@ describe('RSS source connection', () => {
     await user.click(within(dialog).getByRole('button', { name: '接入' }))
 
     expect(await within(dialog).findByText('没有找到可读取的 Feed')).toBeVisible()
-    expect(JSON.parse(String(request.mock.calls[0][1]?.body))).toMatchObject({ initialMode: 'from-now' })
+    const connectCall = request.mock.calls.find(([, init]) => init?.method === 'POST')
+    expect(JSON.parse(String(connectCall?.[1]?.body))).toMatchObject({ initialMode: 'from-now' })
   })
 })

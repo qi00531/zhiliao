@@ -1,4 +1,4 @@
-import { RssApiError, type ConnectRssResponse, type RssInitialMode, type RssItemDto, type RssSourceDto } from './types'
+import { RssApiError, type ConnectRssResponse, type RssInitialMode, type RssItemDetailDto, type RssItemDto, type RssSourceDto } from './types'
 
 type Fetcher = typeof fetch
 
@@ -23,11 +23,16 @@ export function createRssApi(request?: Fetcher) {
     },
     async listSources() {
       const response = await send('/api/rss/sources')
-      return (await readResponse<{ sources: RssSourceDto[] }>(response)).sources
+      const data = await readResponse<{ sources?: RssSourceDto[] }>(response)
+      return Array.isArray(data.sources) ? data.sources : []
     },
     async listItems() {
       const response = await send('/api/rss/items')
-      return (await readResponse<{ items: RssItemDto[] }>(response)).items
+      const data = await readResponse<{ items?: RssItemDto[] }>(response)
+      return Array.isArray(data.items) ? data.items : []
+    },
+    async getItem(id: string) {
+      return readResponse<RssItemDetailDto>(await send(`/api/rss/items/${id}`))
     },
     async updateSource(id: string, changes: Partial<Pick<RssSourceDto, 'status' | 'frequency'>>) {
       return readResponse<RssSourceDto>(await send(`/api/rss/sources/${id}`, {

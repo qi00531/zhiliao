@@ -24,6 +24,18 @@ export interface RssItemDto {
   initialImport: boolean
 }
 
+export interface RssEvidenceDto {
+  id: string
+  url: string
+  title: string
+  excerpt: string
+  capturedAt: string
+}
+
+export interface RssItemDetailDto extends RssItemDto {
+  evidence: RssEvidenceDto[]
+}
+
 export interface ConnectRssResponse {
   source: RssSourceDto
   initialItems: RssItemDto[]
