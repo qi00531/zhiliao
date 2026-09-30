@@ -199,9 +199,22 @@ main { width: min(100% - 40px, 1160px); margin: 0 auto; }
 .source-row__detail { color: #99988e; font-size: 11px; }
 .source-row__check { display: grid; place-items: center; width: 18px; height: 18px; color: #f7f4eb; background: transparent; border: 1px solid #c6c2b5; border-radius: 50%; }
 .source-row--selected .source-row__check { background: #4c5c51; border-color: #4c5c51; }
-.add-source-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 15px; }
+.add-source-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-top: 15px; }
 .add-source-row button { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px; color: #7a7970; font-size: 11px; border: 1px dashed #c9c5b9; border-radius: 3px; }
 .add-source-row button:hover { color: var(--ink); border-color: #949085; }
+.rss-drawer { display: flex; flex-direction: column; }
+.rss-url { display: grid; gap: 8px; margin-top: 24px; }
+.rss-url span { color: var(--muted); font-size: 11px; }
+.rss-url input { width: 100%; padding: 13px 0; color: var(--ink); font: inherit; font-size: 14px; background: transparent; border: 0; border-bottom: 1px solid var(--hairline); outline: none; }
+.rss-url input:focus { border-color: #59695f; }
+.rss-import-mode { margin: 20px 0 6px; color: var(--muted); font-size: 11px; }
+.rss-import-mode summary { cursor: pointer; }
+.rss-import-mode label { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--ink); }
+.rss-error { margin: 16px 0 0; color: #8b4036; font-size: 12px; }
+.rss-connected { display: grid; justify-items: start; gap: 16px; margin-top: 40px; }
+.rss-connected svg { color: #52655a; }
+.rss-connected strong { font-size: 17px; font-weight: 500; }
+.rss-connected button { padding: 9px 0; color: #52655a; background: transparent; border: 0; cursor: pointer; }
 .analyze-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 28px; padding: 13px 16px; color: #f9f6ed; background: #2f312a; border: 0; border-radius: 3px; cursor: pointer; }
 .analyze-button:hover { background: #171813; }
 .analyze-button:disabled { opacity: .55; cursor: wait; }
