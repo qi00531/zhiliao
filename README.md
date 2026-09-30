@@ -1,20 +1,63 @@
-# 知了 Web Demo
+# 知了
 
-面向信息过载场景的个人注意力路由器前端原型。当前使用本地演示分析器，无后端依赖。
+面向信息过载场景的个人信息秘书。当前保留原有前端演示，同时提供第一条真实 RSS 垂直链路：接入 Feed、建立基线、后台增量检查、保存证据并在首页展示新内容。
+
+## 本地运行
+
+需要 Node.js 20+、npm 和 Docker。复制环境变量并启动 PostgreSQL：
 
 ```bash
+cp .env.example .env
+docker compose up -d db
+set -a && . ./.env && set +a
 npm install
+npm run db:migrate
+```
+
+分别启动 API/Worker 和 Web：
+
+```bash
+npm run server:dev
 npm run dev
 ```
 
-生产构建与测试：
+浏览器打开 `http://127.0.0.1:5173`。服务端默认只监听 `127.0.0.1:8787`，Vite 将 `/api` 代理到服务端。
+
+也可以使用 `npm run dev:all` 同时启动两个进程。
+
+> 当前阶段没有应用级登录。只能在本机使用，或部署在具有可信身份验证的访问层之后；不要直接暴露到公网。
+
+## RSS 行为
+
+- 手动输入 RSS、Atom 或 JSON Feed 地址。
+- 默认保存最近 20 条作为基线，首页只显示最新 3 条并标记“首次导入”。
+- 可选择“从现在开始”，此时历史内容不进入首页。
+- 后续内容按稳定 ID、规范化链接和内容指纹去重。
+- ETag 与 Last-Modified 只在成功事务后更新；失败不会被解释为“没有更新”。
+- 摘要、历史、抓取状态和技术字段默认折叠。
+- 频率、暂停、失败详情和手动重试集中在设置中。
+- 抓取使用公网 URL 校验、重定向逐跳检查、超时和 2 MiB 默认大小上限。
+
+PostgreSQL 数据保存在 Docker 卷 `zhiliao-postgres`（Compose 会添加项目名前缀）。备份前先确认实际卷名：
 
 ```bash
-npm run test
-npm run build
+docker compose volumes
 ```
 
-真实分析能力的接入边界位于 `src/domain/types.ts` 中的 `AttentionAnalyzer`。后续实现新的分析器并替换 `DemoAttentionAnalyzer` 即可接入后端或大模型服务。
+## 验证
+
+```bash
+npm run lint
+npm test
+npm run build
+TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/zhiliao_test npm test -- server/rss/rss-flow.test.ts
+```
+
+数据库集成测试使用专用 `zhiliao_test` 数据库和独立 workspace，只删除测试自己创建的数据。
+
+## 前端 Demo
+
+尚未接入 RSS 的其他区域继续使用本地演示数据。真实分析能力的边界位于 `src/domain/types.ts` 中的 `AttentionAnalyzer`；自动研究、大模型和知识沉淀不属于本次 RSS 切片。
 
 ## 可演示路径
 

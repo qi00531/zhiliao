@@ -11,7 +11,7 @@ const pool = createPool(config.databaseUrl)
 await migrate(pool)
 const repository = new RssRepository(pool)
 const fetchFeed = createFeedFetcher({ timeoutMs: config.fetchTimeoutMs, maxBytes: config.maxFeedBytes })
-const service = createRssIngestionService({ pool, repository, fetchFeed })
+const service = createRssIngestionService({ repository, fetchFeed })
 const app = buildApp({ repository, service })
 
 app.addHook('onClose', async () => { await pool.end() })

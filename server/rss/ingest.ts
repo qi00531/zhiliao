@@ -1,4 +1,3 @@
-import type { Pool } from 'pg'
 import { parseFeed } from './parse-feed'
 import { RssRepository } from './repository'
 
@@ -7,8 +6,7 @@ type FetchResult =
   | { kind: 'fetched'; status: number; url: string; body: string; contentType: string; etag: string | null; lastModified: string | null }
 type FetchFeed = (url: string, conditional: { etag?: string | null; lastModified?: string | null }) => Promise<FetchResult>
 
-export function createRssIngestionService({ pool, repository, fetchFeed }: {
-  pool: Pool
+export function createRssIngestionService({ repository, fetchFeed }: {
   repository: RssRepository
   fetchFeed: FetchFeed
 }) {
@@ -29,6 +27,7 @@ export function createRssIngestionService({ pool, repository, fetchFeed }: {
         etag: response.etag,
         lastModified: response.lastModified,
       })
+      await repository.markSeen(client, source.id, feed.items.map((item) => item.externalId))
       for (const [index, item] of items.entries()) {
         await repository.insertItem(client, source.id, item, true, initialMode === 'latest-20' && index < 3)
       }
@@ -60,6 +59,8 @@ export function createRssIngestionService({ pool, repository, fetchFeed }: {
       for (const item of feed.items) {
         const existing = await repository.findItem(client, sourceId, item.externalId)
         if (!existing) {
+          if (await repository.hasSeen(client, sourceId, item.externalId)) continue
+          await repository.markSeen(client, sourceId, [item.externalId])
           await repository.insertItem(client, sourceId, item, false, true)
           added += 1
         } else if (existing.current_content_hash !== item.contentHash) {

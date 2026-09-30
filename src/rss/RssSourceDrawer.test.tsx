@@ -25,7 +25,7 @@ describe('RSS source connection', () => {
   })
 
   it('supports starting from now and shows a concise API error', async () => {
-    const request = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => new Response(JSON.stringify({
+    const request = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(async () => new Response(JSON.stringify({
       error: { code: 'UNSUPPORTED_FEED', message: '没有找到可读取的 Feed' },
     }), { status: 502, headers: { 'content-type': 'application/json' } }))
     vi.stubGlobal('fetch', request)

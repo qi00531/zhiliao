@@ -80,6 +80,22 @@ export class RssRepository {
     return id
   }
 
+  async markSeen(target: Queryable, sourceId: string, externalIds: string[]) {
+    if (!externalIds.length) return
+    await target.query(
+      `insert into rss_seen_items (source_id, external_id)
+       select $1, unnest($2::text[]) on conflict (source_id, external_id) do nothing`,
+      [sourceId, externalIds],
+    )
+  }
+
+  async hasSeen(target: Queryable, sourceId: string, externalId: string) {
+    const result = await target.query(
+      'select 1 from rss_seen_items where source_id=$1 and external_id=$2', [sourceId, externalId],
+    )
+    return Boolean(result.rowCount)
+  }
+
   async findItem(target: Queryable, sourceId: string, externalId: string) {
     const result = await target.query(
       'select id, current_content_hash from rss_items where source_id = $1 and external_id = $2',

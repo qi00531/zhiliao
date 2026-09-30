@@ -35,7 +35,7 @@ describeDatabase('RSS ingestion', () => {
 
   it('stores twenty baseline items and exposes only the newest three', async () => {
     const fetchFeed = vi.fn(async () => fetched(rss(22)))
-    const service = createRssIngestionService({ pool: pool!, repository: repository!, fetchFeed })
+    const service = createRssIngestionService({ repository: repository!, fetchFeed })
     const source = await service.connectFeed('https://example.com/feed.xml', 'latest-20')
 
     expect(await repository!.countItems(source.id)).toBe(20)
@@ -46,7 +46,7 @@ describeDatabase('RSS ingestion', () => {
 
   it('stores a from-now baseline without exposing history', async () => {
     const fetchFeed = vi.fn(async () => fetched(rss(4)))
-    const service = createRssIngestionService({ pool: pool!, repository: repository!, fetchFeed })
+    const service = createRssIngestionService({ repository: repository!, fetchFeed })
     const source = await service.connectFeed('https://example.com/from-now.xml', 'from-now')
     expect(await repository!.countItems(source.id)).toBe(4)
     expect(await repository!.listVisibleItems({ sourceId: source.id })).toHaveLength(0)
@@ -56,7 +56,7 @@ describeDatabase('RSS ingestion', () => {
     const fetchFeed = vi.fn()
       .mockResolvedValueOnce(fetched(rss(2), 'v1'))
       .mockResolvedValue(fetched(rss(3), 'v2'))
-    const service = createRssIngestionService({ pool: pool!, repository: repository!, fetchFeed })
+    const service = createRssIngestionService({ repository: repository!, fetchFeed })
     const source = await service.connectFeed('https://example.com/incremental.xml', 'from-now')
     await service.refreshSource(source.id)
     await service.refreshSource(source.id)
@@ -68,7 +68,7 @@ describeDatabase('RSS ingestion', () => {
     const fetchFeed = vi.fn()
       .mockResolvedValueOnce(fetched(rss(1), 'v1'))
       .mockResolvedValueOnce(fetched(rss(1, true), 'v2'))
-    const service = createRssIngestionService({ pool: pool!, repository: repository!, fetchFeed })
+    const service = createRssIngestionService({ repository: repository!, fetchFeed })
     const source = await service.connectFeed('https://example.com/revision.xml', 'from-now')
     await service.refreshSource(source.id)
     expect(await repository!.countItems(source.id)).toBe(1)
@@ -79,7 +79,7 @@ describeDatabase('RSS ingestion', () => {
     const fetchFeed = vi.fn()
       .mockResolvedValueOnce(fetched(rss(1), 'v1'))
       .mockRejectedValueOnce(Object.assign(new Error('offline'), { code: 'FETCH_FAILED' }))
-    const service = createRssIngestionService({ pool: pool!, repository: repository!, fetchFeed })
+    const service = createRssIngestionService({ repository: repository!, fetchFeed })
     const source = await service.connectFeed('https://example.com/failure.xml', 'from-now')
     await expect(service.refreshSource(source.id)).rejects.toThrow('offline')
     expect((await repository!.getSource(source.id))?.etag).toBe('v1')

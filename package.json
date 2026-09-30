@@ -43,6 +43,7 @@
     "globals": "latest",
     "jsdom": "latest",
     "tsx": "^4.23.15",
+    "typescript-eslint": "^8.71.0",
     "vitest": "latest"
   }
 }
