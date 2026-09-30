@@ -64,7 +64,7 @@ export function createFeedFetcher(options: FetcherOptions) {
         if (error instanceof DOMException && error.name === 'TimeoutError') throw new FeedFetchError('FETCH_TIMEOUT', '抓取超时')
         throw new FeedFetchError('FETCH_FAILED', '无法获取 Feed')
       }
-      if (response.status === 304) return { kind: 'not-modified' as const, status: 304 }
+      if (response.status === 304) return { kind: 'not-modified' as const, status: 304 as const }
       if (response.status >= 300 && response.status < 400) {
         const location = response.headers.get('location')
         if (!location) throw new FeedFetchError('FETCH_FAILED', 'Feed 重定向无效')

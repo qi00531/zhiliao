@@ -181,4 +181,70 @@ export class RssRepository {
       firstSeenAt: row.first_seen_at, initialImport: row.initial_import,
     }))
   }
+
+  async listSources() {
+    const result = await this.pool.query(
+      `select id, title, url, site_url, status, frequency, last_success_at, next_fetch_at,
+       last_error_code, last_error_message, etag, last_modified
+       from rss_sources where workspace_id=$1 order by created_at desc`, [this.workspaceId],
+    )
+    return result.rows.map((row) => ({
+      id: row.id, title: row.title, url: row.url, siteUrl: row.site_url, status: row.status,
+      frequency: row.frequency, lastSuccessAt: row.last_success_at, nextFetchAt: row.next_fetch_at,
+      lastErrorCode: row.last_error_code, lastErrorMessage: row.last_error_message,
+      etag: row.etag, lastModified: row.last_modified,
+    }))
+  }
+
+  async getItemWithEvidence(id: string) {
+    const item = await this.pool.query(
+      `select i.id, i.title, i.url, i.summary_text, i.published_at, i.first_seen_at, i.initial_import,
+       s.id source_id, s.title source_title
+       from rss_items i join rss_sources s on s.id=i.source_id
+       where i.id=$1 and s.workspace_id=$2`, [id, this.workspaceId],
+    )
+    if (!item.rowCount) return null
+    const evidence = await this.pool.query(
+      `select id, url, title, excerpt, captured_at from rss_evidence where item_id=$1 order by captured_at desc`, [id],
+    )
+    const row = item.rows[0]
+    return {
+      id: row.id, title: row.title, url: row.url, summaryText: row.summary_text,
+      publishedAt: row.published_at, firstSeenAt: row.first_seen_at, initialImport: row.initial_import,
+      sourceId: row.source_id, sourceTitle: row.source_title,
+      evidence: evidence.rows.map((entry) => ({
+        id: entry.id, url: entry.url, title: entry.title, excerpt: entry.excerpt, capturedAt: entry.captured_at,
+      })),
+    }
+  }
+
+  async updateSourceSettings(id: string, input: { status?: 'active' | 'paused'; frequency?: 'adaptive' | 'immediate' | 'daily' | 'weekly' | 'manual' }) {
+    const result = await this.pool.query(
+      `update rss_sources set status=coalesce($3,status), frequency=coalesce($4,frequency),
+       next_fetch_at=case when $3='active' then now() else next_fetch_at end, updated_at=now()
+       where id=$1 and workspace_id=$2 returning id, title, status, frequency`,
+      [id, this.workspaceId, input.status ?? null, input.frequency ?? null],
+    )
+    return result.rows[0] ?? null
+  }
+
+  async claimDueSources(limit: number) {
+    return this.transaction(async (client) => {
+      const result = await client.query(
+        `select id from rss_sources where workspace_id=$1 and status in ('active','error')
+         and frequency <> 'manual' and next_fetch_at <= now()
+         order by next_fetch_at asc for update skip locked limit $2`, [this.workspaceId, limit],
+      )
+      const ids = result.rows.map((row) => row.id as string)
+      if (ids.length) {
+        await client.query(`update rss_sources set next_fetch_at=now()+interval '5 minutes' where id=any($1::uuid[])`, [ids])
+      }
+      return ids
+    })
+  }
+
+  async checkHealth() {
+    await this.pool.query('select 1')
+    return true
+  }
 }
