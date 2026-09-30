@@ -216,6 +216,18 @@ main { width: min(100% - 40px, 1160px); margin: 0 auto; }
 .rss-connected strong { font-size: 17px; font-weight: 500; }
 .rss-connected button { padding: 9px 0; color: #52655a; background: transparent; border: 0; cursor: pointer; }
 .rss-item__summary { max-width: 640px; margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+.rss-source-setting { padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+.rss-source-setting__main { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; }
+.rss-source-setting__main > span { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.rss-source-setting__main strong { overflow: hidden; font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.rss-source-setting__main small { color: var(--muted); font-size: 10px; }
+.rss-source-setting__main select, .rss-source-setting__main button, .rss-source-setting details button { color: var(--muted); background: transparent; border: 0; font-size: 11px; cursor: pointer; }
+.rss-source-setting details { margin-top: 10px; color: var(--muted); font-size: 10px; }
+.rss-source-setting summary { cursor: pointer; }
+.rss-source-setting dl { margin: 10px 0; }
+.rss-source-setting dl div { display: grid; grid-template-columns: 42px 1fr; gap: 8px; margin-top: 6px; }
+.rss-source-setting dt { color: #9a988e; }
+.rss-source-setting dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
 .analyze-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 28px; padding: 13px 16px; color: #f9f6ed; background: #2f312a; border: 0; border-radius: 3px; cursor: pointer; }
 .analyze-button:hover { background: #171813; }
 .analyze-button:disabled { opacity: .55; cursor: wait; }

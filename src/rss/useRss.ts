@@ -29,5 +29,15 @@ export function useRss() {
     }
   }, [])
 
-  return { sources, items, loading, error, connect, load, setSources, setItems }
+  const updateSource = useCallback(async (id: string, changes: Partial<Pick<RssSourceDto, 'status' | 'frequency'>>) => {
+    const updated = await rssApi.updateSource(id, changes)
+    setSources((current) => current.map((source) => source.id === id ? { ...source, ...updated } : source))
+  }, [])
+
+  const runSource = useCallback(async (id: string) => {
+    await rssApi.runSource(id)
+    await load()
+  }, [load])
+
+  return { sources, items, loading, error, connect, load, updateSource, runSource, setSources, setItems }
 }
