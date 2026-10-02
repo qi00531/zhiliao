@@ -3,6 +3,8 @@ import { createServer, type Server } from 'node:http'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { buildApp } from '../app'
+import { AnalysisRepository } from '../ai/repository'
+import { createAnalysisWorker } from '../ai/worker'
 import { migrate } from '../db/migrate'
 import { createPool } from '../db/pool'
 import { createFeedFetcher } from './fetch-feed'
@@ -56,6 +58,12 @@ describeDatabase('complete RSS flow', () => {
       maxBytes: 1_000_000,
     })
     const service = createRssIngestionService({ repository, fetchFeed })
+    const analysisRepository = new AnalysisRepository(pool!, workspaceId)
+    const analysisWorker = createAnalysisWorker({
+      repository: analysisRepository,
+      analyzer: { analyze: async () => ({ summary: '摘要', relevance: 'high', reason: '相关', model: 'fixture-model' }) },
+      intervalMs: 1_000,
+    })
     const app = buildApp({ repository, service, startWorker: false })
 
     const connected = await app.inject({ method: 'POST', url: '/api/rss/sources', payload: {
@@ -74,6 +82,11 @@ describeDatabase('complete RSS flow', () => {
     expect(items[0]).toMatchObject({ title: 'Item 23', initialImport: false })
     const detail = (await app.inject({ method: 'GET', url: `/api/rss/items/${items[0].id}` })).json()
     expect(detail.evidence[0]).toMatchObject({ url: 'http://feed.test/23' })
+    expect(detail.analysis).toMatchObject({ status: 'pending' })
+    for (let index = 0; index < 21; index += 1) await analysisWorker.runOnce()
+    const analyzed = (await app.inject({ method: 'GET', url: `/api/rss/items/${items[0].id}` })).json()
+    expect(analyzed.analysis).toMatchObject({ status: 'completed', summary: '摘要', model: 'fixture-model' })
+    expect(analyzed.evidence[0]).toMatchObject({ url: 'http://feed.test/23' })
 
     const beforeFailure = await repository.getSource(sourceId)
     status = 500
