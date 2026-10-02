@@ -12,7 +12,8 @@
     "db:migrate": "tsx server/db/migrate.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "dev:setup": "tsx scripts/dev-setup.ts"
   },
   "dependencies": {
     "@fastify/static": "^10.1.5",

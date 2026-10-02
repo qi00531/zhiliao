@@ -21,6 +21,14 @@ npm run server:dev
 npm run dev
 ```
 
+也可以用一个命令完成数据库启动、迁移、API、Worker 和 Web 启动：
+
+```bash
+npm run dev:setup
+```
+
+配置真实分析时，在 `.env` 中取消 `AI_BASE_URL`、`AI_API_KEY`、`AI_MODEL` 注释并填写 OpenAI 兼容服务。未配置时，RSS 仍正常抓取，`/api/ai/status` 返回 `not_configured`，手动分析返回 `AI_NOT_CONFIGURED`。
+
 浏览器打开 `http://127.0.0.1:5173`。服务端默认只监听 `127.0.0.1:8787`，Vite 将 `/api` 代理到服务端。
 
 也可以使用 `npm run dev:all` 同时启动两个进程。
@@ -57,7 +65,7 @@ TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/zhiliao_test npm
 
 ## 前端 Demo
 
-尚未接入 RSS 的其他区域继续使用本地演示数据。真实分析能力的边界位于 `src/domain/types.ts` 中的 `AttentionAnalyzer`；自动研究、大模型和知识沉淀不属于本次 RSS 切片。
+RSS 新内容已接入真实 OpenAI 兼容分析：原文与证据先入库，后台生成简短摘要和相关性。知识库问答、自动研究及其他演示区域仍使用本地数据，不会伪装成已接入模型。
 
 ## 可演示路径
 
