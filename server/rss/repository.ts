@@ -77,6 +77,7 @@ export class RssRepository {
     if (!result.rowCount) return null
     await this.insertRevision(target, id, item)
     await this.insertEvidence(target, id, sourceId, item)
+    await target.query('insert into rss_item_analysis (item_id) values ($1) on conflict (item_id) do nothing', [id])
     return id
   }
 
@@ -112,6 +113,9 @@ export class RssRepository {
     )
     await this.insertRevision(target, id, item)
     await this.insertEvidence(target, id, sourceId, item)
+    await target.query(`insert into rss_item_analysis (item_id, status, attempt_count, next_attempt_at, updated_at)
+      values ($1, 'pending', 0, now(), now()) on conflict (item_id) do update set
+      status='pending', attempt_count=0, next_attempt_at=now(), last_error_code=null, last_error_message=null, updated_at=now()`, [id])
   }
 
   private async insertRevision(target: Queryable, itemId: string, item: NormalizedFeedItem) {
