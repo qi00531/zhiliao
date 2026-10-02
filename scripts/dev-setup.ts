@@ -22,16 +22,22 @@ export function databaseEndpoint(databaseUrl: string) {
   return { host: url.hostname, port: Number(url.port || 5432) }
 }
 
-async function waitForDatabase(databaseUrl: string, timeoutMs = 30_000) {
+export function shouldStartDatabase(available: boolean) { return !available }
+
+async function canConnect(databaseUrl: string) {
   const endpoint = databaseEndpoint(databaseUrl)
+  return new Promise<boolean>((resolve) => {
+    const socket = connect(endpoint, () => { socket.end(); resolve(true) })
+    socket.setTimeout(1_000)
+    socket.on('timeout', () => { socket.destroy(); resolve(false) })
+    socket.on('error', () => resolve(false))
+  })
+}
+
+async function waitForDatabase(databaseUrl: string, timeoutMs = 30_000) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    const available = await new Promise<boolean>((resolve) => {
-      const socket = connect(endpoint, () => { socket.end(); resolve(true) })
-      socket.setTimeout(1_000)
-      socket.on('timeout', () => { socket.destroy(); resolve(false) })
-      socket.on('error', () => resolve(false))
-    })
+    const available = await canConnect(databaseUrl)
     if (available) return
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
@@ -49,8 +55,10 @@ export async function main() {
   const env = parseEnvFile(readFileSync('.env', 'utf8'))
   const databaseUrl = env.DATABASE_URL
   if (!databaseUrl) throw new Error('.env 缺少 DATABASE_URL')
-  runChecked('docker', ['compose', 'up', '-d', 'db'], env)
-  await waitForDatabase(databaseUrl)
+  if (shouldStartDatabase(await canConnect(databaseUrl))) {
+    runChecked('docker', ['compose', 'up', '-d', 'db'], env)
+    await waitForDatabase(databaseUrl)
+  }
   runChecked('npm', ['run', 'db:migrate'], env)
   const application = spawn('npm', ['run', 'dev:all'], { stdio: 'inherit', env })
   const stop = (signal: NodeJS.Signals) => application.kill(signal)
