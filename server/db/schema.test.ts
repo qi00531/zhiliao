@@ -56,8 +56,8 @@ describeDatabase('RSS database schema', () => {
     )
     await client.query('delete from rss_sources where id = $1', [sourceId])
 
-    const items = await client.query('select count(*)::int as count from rss_items')
-    const evidence = await client.query('select count(*)::int as count from rss_evidence')
+    const items = await client.query('select count(*)::int as count from rss_items where source_id=$1', [sourceId])
+    const evidence = await client.query('select count(*)::int as count from rss_evidence where source_id=$1', [sourceId])
     expect(items.rows[0].count).toBe(0)
     expect(evidence.rows[0].count).toBe(0)
   })
