@@ -14,6 +14,28 @@ describe('readConfig', () => {
       webOrigin: 'http://127.0.0.1:5173',
       fetchTimeoutMs: 10_000,
       maxFeedBytes: 2_097_152,
+      ai: null,
     })
+  })
+
+  it('reads a complete OpenAI-compatible configuration', () => {
+    expect(readConfig({
+      DATABASE_URL: 'postgres://local/test',
+      AI_BASE_URL: 'https://api.example.com/v1',
+      AI_API_KEY: 'secret-key',
+      AI_MODEL: 'example-model',
+    }).ai).toEqual({
+      baseUrl: 'https://api.example.com/v1',
+      apiKey: 'secret-key',
+      model: 'example-model',
+      timeoutMs: 30_000,
+    })
+  })
+
+  it('rejects a partial AI configuration', () => {
+    expect(() => readConfig({
+      DATABASE_URL: 'postgres://local/test',
+      AI_BASE_URL: 'https://api.example.com/v1',
+    })).toThrow('AI_BASE_URL, AI_API_KEY and AI_MODEL')
   })
 })
