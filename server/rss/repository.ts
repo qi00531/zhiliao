@@ -219,8 +219,11 @@ export class RssRepository {
   async getItemWithEvidence(id: string) {
     const item = await this.pool.query(
       `select i.id, i.title, i.url, i.summary_text, i.published_at, i.first_seen_at, i.initial_import,
-       s.id source_id, s.title source_title
+       s.id source_id, s.title source_title, a.status analysis_status, a.summary analysis_summary,
+       a.relevance analysis_relevance, a.reason analysis_reason, a.model analysis_model,
+       a.last_error_code analysis_error_code, a.last_error_message analysis_error_message, a.completed_at analysis_completed_at
        from rss_items i join rss_sources s on s.id=i.source_id
+       left join rss_item_analysis a on a.item_id=i.id
        where i.id=$1 and s.workspace_id=$2`, [id, this.workspaceId],
     )
     if (!item.rowCount) return null
@@ -232,6 +235,11 @@ export class RssRepository {
       id: row.id, title: row.title, url: row.url, summaryText: row.summary_text,
       publishedAt: row.published_at, firstSeenAt: row.first_seen_at, initialImport: row.initial_import,
       sourceId: row.source_id, sourceTitle: row.source_title,
+      analysis: row.analysis_status ? {
+        status: row.analysis_status, summary: row.analysis_summary, relevance: row.analysis_relevance,
+        reason: row.analysis_reason, model: row.analysis_model, lastErrorCode: row.analysis_error_code,
+        lastErrorMessage: row.analysis_error_message, completedAt: row.analysis_completed_at,
+      } : null,
       evidence: evidence.rows.map((entry) => ({
         id: entry.id, url: entry.url, title: entry.title, excerpt: entry.excerpt, capturedAt: entry.captured_at,
       })),

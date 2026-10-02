@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { AiAnalysisError, type ContentAnalyzer } from './types'
 
 interface AiConfig { baseUrl: string; apiKey: string; model: string; timeoutMs: number }
-type Request = (input: string | URL | Request, init?: RequestInit) => Promise<Response>
+type RequestFn = (input: string | URL, init?: RequestInit) => Promise<Response>
 
 const outputSchema = z.object({
   summary: z.string().trim().min(1).max(120),
@@ -19,7 +19,7 @@ function safeJson(content: string) {
   }
 }
 
-export function createOpenAiCompatibleAnalyzer(config: AiConfig, request: Request = fetch): ContentAnalyzer {
+export function createOpenAiCompatibleAnalyzer(config: AiConfig, request: RequestFn = fetch): ContentAnalyzer {
   return {
     async analyze(input) {
       const controller = new AbortController()
